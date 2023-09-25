@@ -49,7 +49,7 @@ b , k = gradient_descent_runner(x_data,y_data,b,k,lr,epochs)
 print("After {0}  iterations b = {1} , k = {2} , error = {3}".format(epochs,b,k,compute_error(b,k,x_data,y_data)))
 
 #画图
-plt.plot(x_data,y_data,'b')
+plt.plot(x_data,y_data,'b.')
 plt.plot(x_data,k*x_data+b,'r')
 plt.show()
 
