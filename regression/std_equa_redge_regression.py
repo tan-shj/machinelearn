@@ -6,12 +6,13 @@ data = np.genfromtxt("/machine_learn/GITHUB/regression/ridge.csv",delimiter=",")
 x_data = data[1:,2:]
 y_data = data[1:,1,np.newaxis]
 
+#加偏置
 #ones(16,1)生成一个16行1列的矩阵与x_data连接起来，axis=1(0)：方式为把列(行)并起来
 X_data = np.concatenate((np.ones((16,1)),x_data),axis=1)
 
 alphas_test = np.linspace(0.001,1)#在0.001-1之间均匀的生成50个数，默认50
 model = linear_model.RidgeCV(alphas=alphas_test,store_cv_values=True)#训练岭回归模型，输入λ，loss值存在cv.values中
-model.fit(x_data,data[1:,1])
+model.fit(x_data,data[1:,1])#数据维度要一样
 
 #用岭回归的loss函数定义一个函数计算特征的权重 W=(X.T*X).I*X.T*Y
 def weights(xArr,yArr,lam=model.alpha_):
@@ -30,5 +31,12 @@ def weights(xArr,yArr,lam=model.alpha_):
 ws = weights(X_data,y_data)
 print(ws)
 
+#计算出预测值
 y_test = np.mat(X_data)*np.mat(ws)
 print(y_test)
+
+plt.plot(data[1:,0],y_data,"b.")
+plt.plot(data[1:,0],y_test,"r")
+plt.text(1956,85,"model.alpha_=")
+plt.text(1960,85,format(model.alpha_,'.2f'))
+plt.show()
