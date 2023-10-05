@@ -1,44 +1,39 @@
 import numpy as np
+from sklearn.metrics import classification_report
 import matplotlib.pyplot as plt
 from sklearn import preprocessing
-from sklearn.metrics import classification_report
+from sklearn.preprocessing import PolynomialFeatures
 
 #数据是否要标准化
 scale = False
 
-data = np.genfromtxt("\machine_learn\github\classification\LR-testSet.csv",delimiter=",")
+data = np.genfromtxt("\machine_learn\github\classification\LR-testSet2.txt",delimiter=",")
 
 x_data = data[:,:-1]
-y_data = data[:,-1]
-#print(len(x_data)) #观察x_data的数据格式
+y_data = data[:,-1,np.newaxis]
 
 #画点函数
 def plot():
-    x0 = [];x1 = []
-    y0 = [];y1 = []
-    
+    x0=[];y0=[]
+    x1=[];y1=[]
     for i in range(len(x_data)):
         if y_data[i] == 0:
-            x0.append(x_data[i,0])#把数据存进x0中
+            x0.append(x_data[i,0])
             y0.append(x_data[i,1])
         else:
             x1.append(x_data[i,0])
             y1.append(x_data[i,1])
-    scatter0 = plt.scatter(x0,y0,c='b',marker='x')
-    scatter1 = plt.scatter(x1,y1,c='r',marker='o')
+    scatter0 = plt.scatter(x0,y0,c='r',marker='x')
+    scatter1 = plt.scatter(x1,y1,c='b',marker='o')
     plt.legend(handles=[scatter0,scatter1],labels=['label0','label1'],loc='best')
-    #把scatter0、scatter1放进这个图中，设置标签名称，loc=best自动寻找最合适的位置
 
 plot()
 plt.show()
 
-#给数据加偏置，为后面的计算ws做准备
-x_data = data[:,:-1]
-y_data = data[:,-1,np.newaxis]
-print(np.mat(x_data).shape)
-print(np.mat(y_data).shape)
-X_data = np.concatenate((np.ones((100,1)),x_data),axis=1)
-print(X_data.shape)
+# 定义多项式回归,degree的值可以调节多项式的特征
+poly_reg  = PolynomialFeatures(degree=3) 
+# 特征处理
+x_poly = poly_reg.fit_transform(x_data)
 
 #定义sigmoid函数，为分类做准备，x大于0时，y大于0.5，归为1类
 def sigmoid(x):
@@ -57,8 +52,9 @@ def gradAscent(xArr,yArr):
     xMat = np.mat(xArr)
     yMat = np.mat(yArr)
 
-    lr = 0.001
-    epochs = 10000
+    #学习率，迭代次数
+    lr = 0.05
+    epochs = 50000
     costlist = []
 
     m,n = np.shape(xMat)#计算数据行列数，行为样本个数，列为权重值式个数
@@ -75,22 +71,31 @@ def gradAscent(xArr,yArr):
     return ws,costlist
 
 #训练模型，得到权值和损失值
-ws,costlist = gradAscent(X_data,y_data)
+ws,costlist = gradAscent(x_poly,y_data)
 print(ws)
 
-if scale == False:
-    plot()
-    x_test = [[-4],[3]]#取测试数据x的值从-4到3
-    y_test = (-ws[0] - x_test * ws[1])/ws[2]#计算预测值
-    plt.plot(x_test,y_test,'k')#画出决策边界
-    plt.show()
+# 获取数据值所在的范围
+x_min,x_max = x_data[:,0].min() - 1,x_data[:,0].max() + 1
+y_min,y_max = x_data[:,1].min() - 1,x_data[:,1].max() + 1
 
-#画图 记录每一次迭代loss值的变化
-x = np.linspace(0,10000,201)#0-10000,201次，与上面的迭代数一样
-plt.plot(x,costlist,c='r')
-plt.title('Train')
-plt.xlabel('Epochs')
-plt.ylabel('Cost')
+# 生成网格矩阵
+xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.02),
+                     np.arange(y_min, y_max, 0.02))
+
+# np.r_按row来组合array， 
+# np.c_按colunm来组合array
+# ravel与flatten类似，多维数据转一维。flatten不会直接改变原始数据，ravel会直接改变原始数据
+z = sigmoid(poly_reg.fit_transform(np.c_[xx.ravel(), yy.ravel()]).dot(np.array(ws)))
+for i in range(len(z)):
+    if z[i] > 0.5:
+        z[i] = 1
+    else:
+        z[i] = 0
+z = z.reshape(xx.shape)
+
+# 等高线图
+cs = plt.contourf(xx, yy, z)
+plot() 
 plt.show()
 
 #预测函数
@@ -101,6 +106,6 @@ def predict(x_data,ws):
     ws = np.mat(ws)
     return [1 if x >= 0.5 else 0 for x in sigmoid(xMat*ws)]#使用sigmoid函数分类
 
-predictions = predict(X_data,ws)
+predictions = predict(x_poly,ws)
 print(classification_report(y_data,predictions))
 
