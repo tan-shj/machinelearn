@@ -27,6 +27,9 @@ def plot():
     scatter1 = plt.scatter(x1,y1,c='b',marker='o')
     plt.legend(handles=[scatter0,scatter1],labels=['label0','label1'],loc='best')
 
+#与画点函数效果一样
+#plt.scatter(x_data[:,0],x_data[:,1],c=y_data)
+
 plot()
 plt.show()
 
