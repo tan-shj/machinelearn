@@ -32,6 +32,7 @@ plt.show()
 # [[1,x0,x1,x2,x0^2,x0*x1,x0*x2,x1^2,x1^x2,x2^2,x0^3,x0^2*x1,x0^2*x2,x0*x1^2,x0*x1*x2,x0*x2^2,x1^3,x1^2*x2,x1*x2^2,x2^3]]
 # [[2,3,5]]   ->   [[1,2,3,5,4,6,10,9,15,25,8,12,20,18,30,50,27,45,75,125]]
 poly_reg = PolynomialFeatures(degree=3)
+#特征处理
 x_poly = poly_reg.fit_transform(x_data)
 #print(x_poly)
 lin_reg = LinearRegression()
