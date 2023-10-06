@@ -56,5 +56,5 @@ predictions = []
 for i in range(x_test.shape[0]):
     predictions.append(knn(x_test[i],x_train,y_train,5))
 
-print(classification_report(y_test,predictions))
-
+print(classification_report(y_test,predictions))#分类报告
+print(confusion_matrix(y_test,predictions))#混淆矩阵
