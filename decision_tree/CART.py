@@ -10,7 +10,7 @@ featureList = []
 labelList = []
 
 #创建决策树模型
-model = tree.DecisionTreeClassifier(criterion='entropy')
+model = tree.DecisionTreeClassifier()
 #输入数据建立模型
 model.fit(x_data,y_data)
 
