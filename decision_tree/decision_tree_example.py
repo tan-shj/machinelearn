@@ -4,7 +4,7 @@ from sklearn.feature_extraction import DictVectorizer
 import csv
 
 #读入数据
-Dtree = open(r'\machine_learn\github\neural_net\AllElectronics.csv','r')
+Dtree = open(r'\machine_learn\github\decision_tree\AllElectronics.csv','r')
 reader = csv.reader(Dtree)
 
 #获取第一行数据
